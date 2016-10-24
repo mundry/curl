@@ -55,16 +55,20 @@ numeric=`perl -e 'printf("%02x%02x%02x\n", '"$major, $minor, $patch);"`
 HEADER=include/curl/curlver.h
 CHEADER=src/tool_version.h
 PLIST=lib/libcurl.plist
+CURL_MANPAGE=docs/curl.1
+CURLCONFIG_MANPAGE=docs/curl-config.1
 
 if test -z "$only"; then
     ext=".dist"
     # when not setting up version numbers locally
-    for a in $HEADER $CHEADER $PLIST; do
+    for a in $HEADER $CHEADER $PLIST $CURL_MANPAGE $CURLCONFIG_MANPAGE; do
         cp $a "$a$ext"
     done
     HEADER="$HEADER$ext"
     CHEADER="$CHEADER$ext"
     PLIST="$PLIST$ext"
+    CURL_MANPAGE="$CURL_MANPAGE$ext"
+    CURLCONFIG_MANPAGE="$CURLCONFIG_MANPAGE$ext"
 fi
 
 # requires a date command that knows -u for UTC time zone
@@ -84,6 +88,12 @@ sed -i 's/#define CURL_VERSION .*/#define CURL_VERSION "'$curlversion'"/g' $CHEA
 
 # Replace version number in plist file:
 sed -i "s/7\.12\.3/$libversion/g" $PLIST
+
+# Set date and version in the man pages.
+sed -i -e "s/@@CURL_RELEASE_DATE@@/$(date --utc '+%d %b %Y')/g" \
+    -e "s/@@CURL_VERSION@@/$curlversion/g" \
+ $CURL_MANPAGE \
+ $CURLCONFIG_MANPAGE
 
 if test -n "$only"; then
     # done!

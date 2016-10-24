@@ -1,2 +1,4 @@
 *.html
 *.pdf
+curl.1.dist
+curl-config.1.dist
